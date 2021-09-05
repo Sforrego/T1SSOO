@@ -110,7 +110,7 @@ void connect_sigaction(
   // Set SA_SIGINFO as the primary flag
   // This tells sigaction that the handler receives three parameters instead
   // of one
-  action.sa_flags = SA_SIGINFO;
+  action.sa_flags = SA_SIGINFO | SA_RESTART;
 
   // Associate the signal to the handler
   sigaction(sig, &action, NULL);
