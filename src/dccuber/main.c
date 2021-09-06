@@ -18,7 +18,7 @@ char *info_semaforos[8]; // 4 posiciones + 3 estados + el indice del repartidor
 char *arg_repartidor = "./repartidor";
 char *arg_semaforo = "./semaforo";
 char *semaforo_argv[3];
-int repartidores_creados;
+int repartidores_creados = 0;
 int total_repartidores;
 int time_repartidores;
 int pid_repartidores[10000];
