@@ -11,10 +11,10 @@
 // 2: Dentro de handle usr1 se modifica state_semaforos, pero el state_semaforos que se usa en handler alarm no se ve modificado
 
 int other_id;
-char **state_semaforos;
+char *state_semaforos[3]= {"1", "1", "1"};
 int pid_semaforos[3] = {0, 0, 0}; // id del proceso de cada semaforo
 char *time_semaforos[3];          // tiempo que dura cada semaforo antes de cambiar
-char *info_semaforos[8];          // 4 posiciones + 3 estados + el indice del repartidor
+char *info_semaforos[9];          // 4 posiciones + 3 estados + el indice del repartidor
 char *arg_repartidor = "./repartidor";
 char *arg_semaforo = "./semaforo";
 char *semaforo_argv[3];
@@ -70,11 +70,7 @@ void handle_sigint(int sig)
   {
     kill(pid_semaforos[i], SIGABRT); // termino los semaforos
   }
-  for (int i = 0; i < 3; i++)
-  {
-    free(state_semaforos[i]);
-  }
-  free(state_semaforos);
+
   exit(0);
 }
 
@@ -98,12 +94,14 @@ void fabrica()
       other_id = fork();
       if (!other_id)
       {
+        printf("%s %s %s \n",state_semaforos[0],state_semaforos[1],state_semaforos[2]);
         info_semaforos[4] = state_semaforos[0];
         info_semaforos[5] = state_semaforos[1];
         info_semaforos[6] = state_semaforos[2];
         char indice[50];
         sprintf(indice, "%d", repartidores_creados);
         info_semaforos[7] = indice;
+        info_semaforos[8] = NULL;
         execvp(arg_repartidor, info_semaforos);
       }
       else
@@ -126,18 +124,13 @@ void fabrica()
   // wait for children to finish
   pid_t wpid;
   int status = 0;
-  while ((wpid = wait(&status)) > 0)
-    ;
+  while ((wpid = wait(&status)) > 0);
+
 }
 
 int main(int argc, char const *argv[])
 {
-  state_semaforos = malloc(3 * sizeof(char *));
-  for (int i = 0; i < 3; i++)
-  {
-    state_semaforos[i] = malloc(sizeof(char) + 1);
-    strcpy(state_semaforos[i], "1");
-  }
+
   printf("Semaforos: %s - %s - %s\n", state_semaforos[0], state_semaforos[1], state_semaforos[2]);
   printf("I'm the DCCUBER process and my PID is: %i\n", getpid());
   char *filename = argv[1];
@@ -214,11 +207,8 @@ int main(int argc, char const *argv[])
 
     // espero que la fabrica termine
     waitpid(fabrica_id, NULL, 0);
-    for (int i = 0; i < 3; i++)
-    {
-      free(state_semaforos[i]);
-    }
-    free(state_semaforos);
+
+    printf("SEMAFOROS FREED\n");
     input_file_destroy(data_in);
     for (int i = 0; i < 3; i++)
     {
