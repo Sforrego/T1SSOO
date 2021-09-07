@@ -184,6 +184,7 @@ int main(int argc, char const *argv[])
   {
     // fabrica
     fabrica();
+    exit(0);
   }
   else
   {
